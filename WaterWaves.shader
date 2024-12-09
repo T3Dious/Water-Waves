@@ -6,12 +6,6 @@ Shader "Custom/WaterWaves"
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_Glossiness ("Smoothness", Range(0,1)) = 0.5
 		_Metallic ("Metallic", Range(0,1)) = 0.0
-        _WaveA("Wave A (dir, steepness, wavelength)", Vector) = (1, 0, 0.5, 10)
-		_WaveB("Wave B (dir, steepness, wavelength)", Vector) = (1, 0, 0.5, 10)
-		_WaveC("Wave C (dir, steepness, wavelength)", Vector) = (1, 0, 0.5, 10)
-		_WaveD("Wave A (dir, steepness, wavelength)", Vector) = (1, 0, 0.5, 10)
-		_WaveE("Wave B (dir, steepness, wavelength)", Vector) = (1, 0, 0.5, 10)
-		_WaveF("Wave C (dir, steepness, wavelength)", Vector) = (1, 0, 0.5, 10)
     }
     SubShader
     {
@@ -33,7 +27,9 @@ Shader "Custom/WaterWaves"
             half _Glossiness;
             half _Metallic;
             fixed4 _Color;
-            float4 _WaveA, _WaveB, _WaveC, _WaveD, _WaveE, _WaveF;
+			int _NumberOfWaves;
+            float4 _Waves[1000];
+			float3 ps[1000];
 
 		// float random (float2 st) {
 		// 	return fract(sin(dot(st.xy,
@@ -74,12 +70,10 @@ Shader "Custom/WaterWaves"
 			float3 tangent = 0;
 			float3 binormal = 0;
 			float3 p = gridPoint;
-			p += GerstnerWave(_WaveA, gridPoint, tangent, binormal);
-			p += GerstnerWave(_WaveB, gridPoint, tangent, binormal);
-			p += GerstnerWave(_WaveC, gridPoint, tangent, binormal);
-			p += GerstnerWave(_WaveD, gridPoint, tangent, binormal);
-			p += GerstnerWave(_WaveE, gridPoint, tangent, binormal);
-			p += GerstnerWave(_WaveF, gridPoint, tangent, binormal);
+			for(int i = 0; i < _NumberOfWaves; i++)
+			{
+				p += GerstnerWave(_Waves[i], gridPoint, tangent, binormal);
+			}
 			float3 normal = normalize(cross(binormal, tangent));
 			vertexData.vertex.xyz = p;
 			vertexData.normal = normal;
